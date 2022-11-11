@@ -77,9 +77,7 @@ class DosenController extends Controller
    */
   public function edit(Dosen $dosen)
   {
-    // dd($dosen);
-    // $dosens = Dosen::get();
-    // return view('dosen', ['dosens' => $dosens]);
+    //  
   }
 
   /**
@@ -89,8 +87,23 @@ class DosenController extends Controller
    * @param  \App\Models\Dosen  $dosen
    * @return \Illuminate\Http\Response
    */
-  public function update(Request $request, Dosen $dosen)
+  public function update(Request $request, Dosen $id)
   {
+    // dd($request, $id->id);
+    $request->validate([
+      'dosen_name' => ['required', 'string', 'max:50'],
+    ]);
+    // Dosen::create([
+    //   'major_name' => $request->input('major_name'),
+
+    // ]);
+
+    Dosen::where('id', $id->id)
+      ->update(['dosen_name' => $request->input('dosen_name')]);
+
+    return redirect()
+      ->back()
+      ->with('success', 'Data dosen berhasil diupdate');
   }
 
   /**

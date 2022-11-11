@@ -14,7 +14,10 @@ class MajorController extends Controller
    */
   public function index()
   {
-    return view('jurusan');
+
+    $majors = Major::get();
+
+    return view('major', ['majors' => $majors, 'byId' => '']);
   }
 
   /**
@@ -22,9 +25,21 @@ class MajorController extends Controller
    *
    * @return \Illuminate\Http\Response
    */
-  public function create()
+  public function create(Request $request)
   {
-    return view('major.create');
+    // dd($request);
+    $request->validate([
+      'major_name' => ['required', 'string', 'max:50'],
+    ]);
+
+    Major::create([
+      'major_name' => $request->input('major_name'),
+
+    ]);
+
+    return redirect()
+      ->back()
+      ->with('success', 'Data major berhasil disimpan');
   }
 
   /**
@@ -35,15 +50,7 @@ class MajorController extends Controller
    */
   public function store(Request $request)
   {
-    $validated = $request->validate([
-      'nama' => 'required',
-    ]);
-
-    $student = new Siswa();
-    $student->nama = $request->nama;
-    $student->save();
-    return redirect()->route('student.index')
-      ->with('success', 'Data berhasil dibuat!');
+    // 
   }
 
   /**
@@ -52,22 +59,14 @@ class MajorController extends Controller
    * @param  \App\Models\Major  $major
    * @return \Illuminate\Http\Response
    */
-  public function show(Major $id)
+  public function show(Major $major)
   {
-    $major = Student::findOrFail($id);
-    return view('major.show', compact('major'));
-  }
+    $majors = Major::get();
 
-  /**
-   * Show the form for editing the specified resource.
-   *
-   * @param  \App\Models\Major  $major
-   * @return \Illuminate\Http\Response
-   */
-  public function edit(Major $id)
-  {
-    $major = Student::findOrFail($id);
-    return view('major.edit', compact('major'));
+    return view('major', [
+      'majors' => $majors,
+      'byId' => $major
+    ]);
   }
 
   /**
@@ -79,15 +78,21 @@ class MajorController extends Controller
    */
   public function update(Request $request, Major $id)
   {
-    $validated = $request->validate([
-      'nama' => 'required',
+    // dd($request, $id->id);
+    $request->validate([
+      'major_name' => ['required', 'string', 'max:50'],
     ]);
 
-    $student = new Siswa();
-    $student->nama = $request->nama;
-    $student->save();
-    return redirect()->route('student.index')
-      ->with('success', 'Data berhasil diedit!');
+    // Major::create([
+    //   'major_name' => $request->input('major_name'),
+
+    // ]);
+    Major::where('id', $id->id)
+      ->update(['major_name' => $request->input('major_name')]);
+
+    return redirect()
+      ->back()
+      ->with('success', 'Data major berhasil diupdate');
   }
 
   /**
@@ -98,9 +103,11 @@ class MajorController extends Controller
    */
   public function destroy(Major $major)
   {
-    $major = Major::findOrFail($major);
+    $major = Major::find($major->id);
+
     $major->delete();
-    return redirect()->route('major.index')
-      ->with('success', 'Data berhasil dihapus!');
+    return redirect()
+      ->back()
+      ->with('success', 'Data major berhasil dihapus');
   }
 }
